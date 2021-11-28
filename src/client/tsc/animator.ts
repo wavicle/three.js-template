@@ -1,23 +1,47 @@
-import * as THREE from "three";
-import { Camera, Mesh, Scene } from "three";
-import { Configuration, DEBUG_CONFIG } from "./Configuration";
+import { Camera, Scene } from "three";
+import { Box3d } from "./Box3d";
+import { Configuration, DEFAULT_CONFIG } from "./Configuration";
+import { coloredMaterial } from "./ThreeJSUtils";
 
-let cube: Mesh;
+let cube: Box3d;
 
 export function configure(): Configuration {
-  return DEBUG_CONFIG;
+  return DEFAULT_CONFIG;
 }
 
 export function init(scene: Scene, camera: Camera) {
-  camera.position.z = 1;
-  const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-  const material = new THREE.MeshNormalMaterial();
+  cube = new Box3d({
+    name: "MyCube",
+    position: {
+      x: 0,
+      y: 5,
+      z: 0,
+    },
+    width: 5,
+    height: 5,
+    depth: 5,
+    material: coloredMaterial("#FF0000"),
+    onClick: function () {
+      alert("You clicked the cube!");
+    },
+  });
+  scene.add(cube.raw);
 
-  cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
+  const floor = new Box3d({
+    name: "Floor",
+    width: 40,
+    height: 1,
+    depth: 40,
+    material: coloredMaterial("#00FFFF"),
+    onClick: function () {
+      alert("Why did you click the floor?");
+    },
+  });
+  scene.add(floor.raw);
+
+  alert("Try clicking somewhere!");
 }
 
 export function animate(time: number, scene: Scene, camera: Camera) {
-  cube.rotation.x = time / 1000;
-  cube.rotation.y = time / 1000;
+  cube.raw.rotation.y += 0.01;
 }
