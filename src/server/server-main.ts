@@ -5,6 +5,7 @@ const app = express();
 const port = 8080;
 
 app
+  .use(express.static(path.join(__dirname, "../src/client/static")))
   .get("/", (req: Request, res: Response) => {
     const indexPath = path.join(__dirname, "../src/client/static/index.html");
     console.log(`Index page will be served from: ${indexPath}`);

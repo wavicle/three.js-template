@@ -11,6 +11,14 @@ export function textureFromUrl(url: string): Texture {
   return textureLoader.load(url);
 }
 
+export function texturedMaterial(texture: Texture): Material {
+  return new MeshPhongMaterial({ map: texture });
+}
+
+export function texturedMaterialFromUrl(url: string): Material {
+  return texturedMaterial(textureFromUrl(url));
+}
+
 export function metalMaterial(): Material {
   return new THREE.MeshStandardMaterial({
     metalness: 1,

@@ -1,7 +1,7 @@
 import { Camera, Scene } from "three";
 import { Box3d } from "./Box3d";
 import { Configuration, DEFAULT_CONFIG } from "./Configuration";
-import { coloredMaterial } from "./ThreeJSUtils";
+import { coloredMaterial, texturedMaterialFromUrl } from "./ThreeJSUtils";
 
 let cube: Box3d;
 
@@ -32,7 +32,7 @@ export function init(scene: Scene, camera: Camera) {
     width: 40,
     height: 1,
     depth: 40,
-    material: coloredMaterial("#00FFFF"),
+    material: texturedMaterialFromUrl("images/dirty_concrete.jpg"),
     onClick: function () {
       alert("Why did you click the floor?");
     },
