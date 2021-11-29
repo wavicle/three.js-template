@@ -3,9 +3,9 @@ import $ from "jquery";
 import { configure, init, animate } from "./animator";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import {
-  Camera,
   HemisphereLight,
   Mesh,
+  PerspectiveCamera,
   PointLight,
   Scene,
   Vector2,
@@ -15,7 +15,7 @@ import { Configuration } from "./Configuration";
 import Stats from "three/examples/jsm/libs/stats.module";
 import { ObjectCache } from "./ObjectCache";
 
-let renderer: WebGLRenderer, camera: Camera, scene: Scene;
+let renderer: WebGLRenderer, camera: PerspectiveCamera, scene: Scene;
 let orbitControls: OrbitControls, stats: Stats;
 let mouse: Vector2, clicked: boolean;
 
@@ -40,6 +40,8 @@ $(function () {
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   window.addEventListener("resize", function () {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
   renderer.shadowMap.enabled = true;
