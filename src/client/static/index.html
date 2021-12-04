@@ -7,9 +7,28 @@
         margin: 0px;
         overflow: hidden;
       }
+      #pointerLockPrompt {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        font-size: 16pt;
+        color: white;
+      }
+      .centered {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -moz-transform: translateX(-50%) translateY(-50%);
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
+      }
     </style>
   </head>
   <body>
+    <div id="pointerLockPrompt" class="centered">
+      Click anywhere to continue
+    </div>
     <div id="webgl-output"></div>
   </body>
 </html>

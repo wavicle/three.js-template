@@ -1,15 +1,28 @@
-import { Camera, Scene } from "three";
-import { Box3d } from "./Box3d";
-import { Configuration, DEFAULT_CONFIG } from "./Configuration";
-import { coloredMaterial, texturedMaterialFromUrl } from "./ThreeJSUtils";
+import { Camera, HemisphereLight, Scene, Vector3 } from "three";
+import { Box3d } from "../framework/Box3d";
+import { Configuration } from "../framework/Configuration";
+import { ThreeJSUtils } from "../framework/ThreeJSUtils";
 
 let cube: Box3d;
 
 export function configure(): Configuration {
-  return DEFAULT_CONFIG;
+  return {
+    firstPersonNavigation: {
+      speed: 1,
+    },
+  };
 }
 
 export function init(scene: Scene, camera: Camera) {
+  scene.add(new HemisphereLight("#FFFFFF", "#000000", 1));
+  scene.add(
+    ThreeJSUtils.pointLight({
+      color: "#FFFFFF",
+      intensity: 1,
+      position: new Vector3(0, 20, 0),
+    })
+  );
+
   cube = new Box3d({
     name: "MyCube",
     position: {
@@ -20,7 +33,7 @@ export function init(scene: Scene, camera: Camera) {
     width: 5,
     height: 5,
     depth: 5,
-    material: coloredMaterial("#FF0000"),
+    material: ThreeJSUtils.coloredMaterial("#00FF00"),
     onClick: function () {
       alert("You clicked the cube!");
     },
@@ -32,14 +45,12 @@ export function init(scene: Scene, camera: Camera) {
     width: 40,
     height: 1,
     depth: 40,
-    material: texturedMaterialFromUrl("images/dirty_concrete.jpg"),
+    material: ThreeJSUtils.texturedMaterialFromUrl("images/dirty_concrete.jpg"),
     onClick: function () {
       alert("Why did you click the floor?");
     },
   });
   scene.add(floor.raw);
-
-  alert("Try clicking somewhere!");
 }
 
 export function animate(time: number, scene: Scene, camera: Camera) {

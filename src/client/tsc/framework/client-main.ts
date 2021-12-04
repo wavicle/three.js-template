@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import $ from "jquery";
-import { configure, init, animate } from "./animator";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { configure, init, animate } from "../custom/animator";
+import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
+
 import {
   HemisphereLight,
   Mesh,
@@ -12,23 +13,49 @@ import {
   WebGLRenderer,
 } from "three";
 import { Configuration } from "./Configuration";
-import Stats from "three/examples/jsm/libs/stats.module";
 import { ObjectCache } from "./ObjectCache";
 
 let renderer: WebGLRenderer, camera: PerspectiveCamera, scene: Scene;
-let orbitControls: OrbitControls, stats: Stats;
+let pointerLockControls: PointerLockControls;
 let mouse: Vector2, clicked: boolean;
+let config: Configuration;
 
 const raycaster = new THREE.Raycaster();
 
 $(function () {
+  config = configure();
   clicked = false;
-  window.addEventListener("click", function (event) {
+  document.body.style.cursor = "none";
+  window.addEventListener("mousemove", function (event) {
     mouse = new THREE.Vector2();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  });
+  window.addEventListener("click", function (event) {
+    if (pointerLockControls && !pointerLockControls.isLocked) {
+      pointerLockControls.lock();
+      hidePointerLockPrompt();
+    }
     clicked = true;
   });
+  if (config.firstPersonNavigation) {
+    const speed = config.firstPersonNavigation?.speed || 0;
+    window.addEventListener("keypress", function (event) {
+      switch (event.code) {
+        case "KeyW":
+          pointerLockControls.moveForward(speed);
+          break;
+        case "KeyS":
+          pointerLockControls.moveForward(-speed);
+          break;
+        case "KeyA":
+          pointerLockControls.moveRight(-speed);
+          break;
+        case "KeyD":
+          pointerLockControls.moveRight(speed);
+      }
+    });
+  }
 
   camera = new THREE.PerspectiveCamera(
     70,
@@ -47,24 +74,18 @@ $(function () {
   renderer.shadowMap.enabled = true;
   renderer.setAnimationLoop(function (time) {
     processMouseEvents();
-
     animate(time, scene, camera);
-    if (orbitControls) {
-      orbitControls.update();
-    }
-    if (stats) {
-      stats.update();
-    }
     renderer.render(scene, camera);
   });
   document.body.appendChild(renderer.domElement);
 
-  initFromConfig(configure());
+  initFromConfig();
   init(scene, camera);
 });
 
 function processMouseEvents() {
   if (clicked) {
+    clicked = false;
     raycaster.setFromCamera(mouse, camera);
     const intersections = raycaster.intersectObjects(scene.children) || [];
     if (intersections && intersections.length > 0) {
@@ -74,30 +95,25 @@ function processMouseEvents() {
         higherObject.onClick();
       }
     }
-    clicked = false;
   }
 }
 
-function initFromConfig(config: Configuration) {
+function initFromConfig() {
   camera.position.z = 20;
   camera.position.y = 10;
-  if (config.orbitControls) {
-    orbitControls = new OrbitControls(camera, renderer.domElement);
+  if (config.firstPersonNavigation) {
+    pointerLockControls = new PointerLockControls(camera, renderer.domElement);
+    pointerLockControls.unlock = showPointerLockPrompt;
+    showPointerLockPrompt();
   }
-  if (config.stats) {
-    stats = Stats();
-    document.body.appendChild(stats.dom);
-  }
-  if (config.gridHelper) {
-    scene.add(new THREE.GridHelper(1000, 1000));
-  }
-  if (config.defaultLights.point) {
-    const light = new PointLight("#FFFFFF", 1);
-    light.position.y = 20;
-    light.castShadow = true;
-    scene.add(light);
-  }
-  if (config.defaultLights.hemisphere) {
-    scene.add(new HemisphereLight("#FFFFFF", "111111", 0.4));
-  }
+}
+
+function showPointerLockPrompt() {
+  (document.getElementById("pointerLockPrompt") as HTMLElement).style.display =
+    "block";
+}
+
+function hidePointerLockPrompt() {
+  (document.getElementById("pointerLockPrompt") as HTMLElement).style.display =
+    "none";
 }

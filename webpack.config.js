@@ -23,7 +23,7 @@ const serverConfig = {
 };
 
 const clientConfig = {
-  entry: path.resolve(__dirname, 'src/client/tsc/client-main.ts'),
+  entry: path.resolve(__dirname, 'src/client/tsc/framework/client-main.ts'),
   target: 'web',
   mode: 'none',
   module: {
