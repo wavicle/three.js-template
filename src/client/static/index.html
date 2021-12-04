@@ -9,11 +9,15 @@
       }
       #pointerLockPrompt {
         display: none;
-        position: absolute;
-        top: 50%;
-        left: 50%;
         font-size: 16pt;
         color: white;
+      }
+      #personCursor {
+        display: none;
+        font-size: 20pt;
+        color: white;
+        font-weight: bold;
+        text-shadow: 0px 0px 3px #000000;
       }
       .centered {
         position: absolute;
@@ -29,6 +33,7 @@
     <div id="pointerLockPrompt" class="centered">
       Click anywhere to continue
     </div>
+    <div id="personCursor" class="centered">.</div>
     <div id="webgl-output"></div>
   </body>
 </html>

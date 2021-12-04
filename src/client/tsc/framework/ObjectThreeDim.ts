@@ -10,12 +10,12 @@ export interface ObjectThreeDimCommonParams {
   };
   rotation?: Vector3;
   material: Material | Material[] | undefined;
-  onClick?: () => void;
+  onClick?: (self: ObjectThreeDim) => void;
 }
 
 export class ObjectThreeDim {
   private _mesh: Mesh;
-  private _onClick?: () => void;
+  private _onClick?: (self: ObjectThreeDim) => void;
 
   protected constructor(
     shape: BufferGeometry,
@@ -55,11 +55,11 @@ export class ObjectThreeDim {
     return this._mesh.position;
   }
 
-  get onClick(): (() => void) | undefined {
+  get onClick(): ((self: ObjectThreeDim) => void) | undefined {
     return this._onClick;
   }
 
-  set onClick(handler: (() => void) | undefined) {
+  set onClick(handler: ((self: ObjectThreeDim) => void) | undefined) {
     this._onClick = handler;
   }
 

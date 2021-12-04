@@ -4,20 +4,21 @@ import { configure, init, animate } from "../custom/animator";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 
 import {
-  HemisphereLight,
   Mesh,
   PerspectiveCamera,
-  PointLight,
   Scene,
   Vector2,
+  Vector3,
   WebGLRenderer,
 } from "three";
 import { Configuration } from "./Configuration";
 import { ObjectCache } from "./ObjectCache";
 
+let running: boolean = false;
+
 let renderer: WebGLRenderer, camera: PerspectiveCamera, scene: Scene;
 let pointerLockControls: PointerLockControls;
-let mouse: Vector2, clicked: boolean;
+let clicked: boolean;
 let config: Configuration;
 
 const raycaster = new THREE.Raycaster();
@@ -25,18 +26,8 @@ const raycaster = new THREE.Raycaster();
 $(function () {
   config = configure();
   clicked = false;
-  document.body.style.cursor = "none";
-  window.addEventListener("mousemove", function (event) {
-    mouse = new THREE.Vector2();
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  });
   window.addEventListener("click", function (event) {
-    if (pointerLockControls && !pointerLockControls.isLocked) {
-      pointerLockControls.lock();
-      hidePointerLockPrompt();
-    }
-    clicked = true;
+    processMouseClick();
   });
   if (config.firstPersonNavigation) {
     const speed = config.firstPersonNavigation?.speed || 0;
@@ -53,6 +44,7 @@ $(function () {
           break;
         case "KeyD":
           pointerLockControls.moveRight(speed);
+          break;
       }
     });
   }
@@ -72,27 +64,42 @@ $(function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
   renderer.shadowMap.enabled = true;
-  renderer.setAnimationLoop(function (time) {
-    processMouseEvents();
-    animate(time, scene, camera);
-    renderer.render(scene, camera);
-  });
+  renderer.setAnimationLoop(animateIfNeeded);
   document.body.appendChild(renderer.domElement);
 
   initFromConfig();
   init(scene, camera);
 });
 
+function animateIfNeeded(time: number): void {
+  if (running) {
+    processMouseEvents();
+    animate(time, scene, camera);
+    renderer.render(scene, camera);
+  }
+}
+
+function processMouseClick() {
+  if (running) {
+    clicked = true;
+  }
+  if (pointerLockControls && !pointerLockControls.isLocked) {
+    pointerLockControls.lock();
+    unlockGame();
+  }
+}
+
 function processMouseEvents() {
   if (clicked) {
     clicked = false;
-    raycaster.setFromCamera(mouse, camera);
+    console.log(camera.position, camera.getWorldDirection(new Vector3()));
+    raycaster.set(camera.position, camera.getWorldDirection(new Vector3()));
     const intersections = raycaster.intersectObjects(scene.children) || [];
     if (intersections && intersections.length > 0) {
       const objectName = (intersections[0].object as Mesh).name;
       const higherObject = ObjectCache.get(objectName);
       if (higherObject?.onClick) {
-        higherObject.onClick();
+        higherObject.onClick(higherObject);
       }
     }
   }
@@ -103,17 +110,25 @@ function initFromConfig() {
   camera.position.y = 10;
   if (config.firstPersonNavigation) {
     pointerLockControls = new PointerLockControls(camera, renderer.domElement);
-    pointerLockControls.unlock = showPointerLockPrompt;
-    showPointerLockPrompt();
+    pointerLockControls.addEventListener("unlock", function () {
+      lockGame();
+    });
+    lockGame();
   }
 }
 
-function showPointerLockPrompt() {
+function lockGame() {
+  running = false;
   (document.getElementById("pointerLockPrompt") as HTMLElement).style.display =
     "block";
+  (document.getElementById("personCursor") as HTMLElement).style.display =
+    "none";
 }
 
-function hidePointerLockPrompt() {
+function unlockGame() {
+  running = true;
   (document.getElementById("pointerLockPrompt") as HTMLElement).style.display =
     "none";
+  (document.getElementById("personCursor") as HTMLElement).style.display =
+    "block";
 }
