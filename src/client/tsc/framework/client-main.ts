@@ -1,18 +1,11 @@
 import * as THREE from "three";
 import $ from "jquery";
-import { configure, init, animate } from "../custom/animator";
+import { configure, init, animate, onClick } from "../custom/animator";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 
-import {
-  Mesh,
-  PerspectiveCamera,
-  Scene,
-  Vector2,
-  Vector3,
-  WebGLRenderer,
-} from "three";
+import { Mesh, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from "three";
 import { Configuration } from "./Configuration";
-import { ObjectCache } from "./ObjectCache";
+import { Utils3d } from "./ThreeJSUtils";
 
 let running: boolean = false;
 
@@ -92,22 +85,19 @@ function processMouseClick() {
 function processMouseEvents() {
   if (clicked) {
     clicked = false;
-    console.log(camera.position, camera.getWorldDirection(new Vector3()));
     raycaster.set(camera.position, camera.getWorldDirection(new Vector3()));
-    const intersections = raycaster.intersectObjects(scene.children) || [];
+    const intersections = raycaster.intersectObjects(
+      scene.children
+        .filter((it) => it instanceof Mesh)
+        .filter((it) => Utils3d.isIntersectable(it as Mesh))
+    );
     if (intersections && intersections.length > 0) {
-      const objectName = (intersections[0].object as Mesh).name;
-      const higherObject = ObjectCache.get(objectName);
-      if (higherObject?.onClick) {
-        higherObject.onClick(higherObject);
-      }
+      onClick(intersections);
     }
   }
 }
 
 function initFromConfig() {
-  camera.position.z = 20;
-  camera.position.y = 10;
   if (config.firstPersonNavigation) {
     pointerLockControls = new PointerLockControls(camera, renderer.domElement);
     pointerLockControls.addEventListener("unlock", function () {

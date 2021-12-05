@@ -1,64 +1,62 @@
-import { Camera, HemisphereLight, Scene, Vector3 } from "three";
-import { Box3d } from "../framework/Box3d";
+import {
+  BoxGeometry,
+  Camera,
+  HemisphereLight,
+  Intersection,
+  Mesh,
+  Scene,
+  Vector3,
+} from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Configuration } from "../framework/Configuration";
-import { ObjectThreeDim } from "../framework/ObjectThreeDim";
-import { ThreeJSUtils } from "../framework/ThreeJSUtils";
+import { Utils3d } from "../framework/ThreeJSUtils";
 
-let floor: Box3d;
-let cubes: ObjectThreeDim[] = [];
+const gltfLoader = new GLTFLoader();
 
 export function configure(): Configuration {
   return {
     firstPersonNavigation: {
-      speed: 1,
+      speed: 0.25,
     },
   };
 }
 
 export function init(scene: Scene, camera: Camera) {
-  scene.add(new HemisphereLight("#FFFFFF", "#000000", 1));
+  /** Lights */
+  scene.add(new HemisphereLight("#FFFFFF", "#222222", 2));
   scene.add(
-    ThreeJSUtils.pointLight({
-      color: "#FF0000",
+    Utils3d.pointLight({
+      color: "#FFFFFF",
       intensity: 1,
-      position: new Vector3(0, 20, 0),
+      position: new Vector3(0, 10, 0),
     })
   );
 
-  for (var i = 1; i <= 10; i++) {
-    const cube = new Box3d({
-      name: "MyCube_" + i,
-      position: {
-        x: i * 2,
-        y: i * 2,
-        z: i * 2,
-      },
-      width: 1,
-      height: 1,
-      depth: 1,
-      material: ThreeJSUtils.coloredMaterial(ThreeJSUtils.getRandomColor()),
-      onClick: function (self: ObjectThreeDim) {
-        self.raw.material = ThreeJSUtils.coloredMaterial(
-          ThreeJSUtils.getRandomColor()
-        );
-      },
-    });
-    cubes.push(cube);
-    scene.add(cube.raw);
-  }
+  /** Camera */
+  camera.position.set(0, 4, 15);
 
-  floor = new Box3d({
-    name: "Floor",
-    width: 40,
-    height: 1,
-    depth: 40,
-    material: ThreeJSUtils.texturedMaterialFromUrl("images/dirty_concrete.jpg"),
-  });
-  scene.add(floor.raw);
+  /** Action! */
+  gltfLoader.load(
+    "gltf/scene.glb",
+    (it) => {
+      const suzanne = it.scene.getObjectByName("Suzanne") as Mesh;
+      const floor = it.scene.getObjectByName("Floor") as Mesh;
+      scene.add(suzanne);
+      scene.add(floor);
+      Utils3d.setIntersectable(suzanne);
+    },
+    undefined,
+    (e: ErrorEvent) => {
+      console.log(e);
+    }
+  );
 }
 
 export function animate(time: number, scene: Scene, camera: Camera) {
-  cubes.forEach((cube) => {
-    cube.raw.rotation.x += 0.01;
-  });
+  (scene.getObjectByName("Suzanne") as Mesh).rotation.y += 0.01;
+}
+
+export function onClick(intersections: Intersection[]) {
+  const mesh = intersections[0].object as Mesh;
+  mesh.material = Utils3d.coloredMaterial(Utils3d.getRandomColor());
 }
