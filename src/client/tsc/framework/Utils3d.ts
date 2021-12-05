@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import {
   Material,
   Mesh,
@@ -8,10 +7,21 @@ import {
   Texture,
   Vector3,
 } from "three";
+import { GLTFSceneSupport } from "./GLFTSceneSupport";
+import { SceneSupport } from "./SceneSupport";
 
 const intersectables: Mesh[] = [];
 
 export const Utils3d = {
+  startWithGLTF(
+    url: string,
+    support: SceneSupport,
+    onLoadProgress?: (e: ProgressEvent) => void,
+    onLoadError?: (e: ErrorEvent) => void
+  ): SceneSupport {
+    return new GLTFSceneSupport(url, support, onLoadProgress, onLoadError);
+  },
+
   coloredMaterial: function (color: string): Material {
     return new MeshPhongMaterial({ color: color });
   },

@@ -1,46 +1,42 @@
 import * as THREE from "three";
 import $ from "jquery";
-import { configure, init, animate, onClick } from "../custom/animator";
+import { init, animate, onClick } from "../custom/game-main";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 
 import { Mesh, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from "three";
-import { Configuration } from "./Configuration";
-import { Utils3d } from "./ThreeJSUtils";
+import { Utils3d } from "./Utils3d";
 
 let running: boolean = false;
 
 let renderer: WebGLRenderer, camera: PerspectiveCamera, scene: Scene;
 let pointerLockControls: PointerLockControls;
 let clicked: boolean;
-let config: Configuration;
 
 const raycaster = new THREE.Raycaster();
 
 $(function () {
-  config = configure();
   clicked = false;
   window.addEventListener("click", function (event) {
     processMouseClick();
   });
-  if (config.firstPersonNavigation) {
-    const speed = config.firstPersonNavigation?.speed || 0;
-    window.addEventListener("keypress", function (event) {
-      switch (event.code) {
-        case "KeyW":
-          pointerLockControls.moveForward(speed);
-          break;
-        case "KeyS":
-          pointerLockControls.moveForward(-speed);
-          break;
-        case "KeyA":
-          pointerLockControls.moveRight(-speed);
-          break;
-        case "KeyD":
-          pointerLockControls.moveRight(speed);
-          break;
-      }
-    });
-  }
+
+  const speed = 0.25;
+  window.addEventListener("keypress", function (event) {
+    switch (event.code) {
+      case "KeyW":
+        pointerLockControls.moveForward(speed);
+        break;
+      case "KeyS":
+        pointerLockControls.moveForward(-speed);
+        break;
+      case "KeyA":
+        pointerLockControls.moveRight(-speed);
+        break;
+      case "KeyD":
+        pointerLockControls.moveRight(speed);
+        break;
+    }
+  });
 
   camera = new THREE.PerspectiveCamera(
     70,
@@ -98,13 +94,11 @@ function processMouseEvents() {
 }
 
 function initFromConfig() {
-  if (config.firstPersonNavigation) {
-    pointerLockControls = new PointerLockControls(camera, renderer.domElement);
-    pointerLockControls.addEventListener("unlock", function () {
-      lockGame();
-    });
+  pointerLockControls = new PointerLockControls(camera, renderer.domElement);
+  pointerLockControls.addEventListener("unlock", function () {
     lockGame();
-  }
+  });
+  lockGame();
 }
 
 function lockGame() {

@@ -1,5 +1,4 @@
 import {
-  BoxGeometry,
   Camera,
   HemisphereLight,
   Intersection,
@@ -8,18 +7,9 @@ import {
   Vector3,
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { Configuration } from "../framework/Configuration";
-import { Utils3d } from "../framework/ThreeJSUtils";
+import { Utils3d } from "../framework/Utils3d";
 
 const gltfLoader = new GLTFLoader();
-
-export function configure(): Configuration {
-  return {
-    firstPersonNavigation: {
-      speed: 0.25,
-    },
-  };
-}
 
 export function init(scene: Scene, camera: Camera) {
   /** Lights */
@@ -41,8 +31,10 @@ export function init(scene: Scene, camera: Camera) {
     (it) => {
       const suzanne = it.scene.getObjectByName("Suzanne") as Mesh;
       const floor = it.scene.getObjectByName("Floor") as Mesh;
+
       scene.add(suzanne);
       scene.add(floor);
+
       Utils3d.setIntersectable(suzanne);
     },
     (e) => console.log(e),
