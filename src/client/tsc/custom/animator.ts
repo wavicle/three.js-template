@@ -45,10 +45,8 @@ export function init(scene: Scene, camera: Camera) {
       scene.add(floor);
       Utils3d.setIntersectable(suzanne);
     },
-    undefined,
-    (e: ErrorEvent) => {
-      console.log(e);
-    }
+    (e) => console.log(e),
+    (e) => console.log(e)
   );
 }
 
