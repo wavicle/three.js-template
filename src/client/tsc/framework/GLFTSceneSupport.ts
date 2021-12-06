@@ -1,9 +1,9 @@
-import { Scene } from "three";
+import { Camera, Event, Intersection, Object3D, Scene } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { SceneSupport } from "./SceneSupport";
 
 export class GLTFSceneSupport implements SceneSupport {
-  private readonly loader: GLTFLoader = new GLTFLoader();
+  private loader: GLTFLoader = new GLTFLoader();
   private gltf?: GLTF;
 
   constructor(
@@ -13,23 +13,28 @@ export class GLTFSceneSupport implements SceneSupport {
     private readonly onLoadError?: (e: ErrorEvent) => void
   ) {}
 
-  populate(scene: Scene): void {
+  prepare(scene: Scene, camera: Camera): void {
     this.loader.load(
       this.url,
-      (gltf) => this.onGLTFLoaded(gltf, scene),
+      (gltf) => this.onGLTFLoaded(gltf, scene, camera),
       this.onLoadProgress,
       this.onLoadError
     );
   }
 
-  animate(scene: Scene, time: number): void {
+  animate(scene: Scene, camera: Camera, time: number): void {
     if (this.gltf) {
-      this.support.animate(scene, time);
+      this.support.animate(scene, camera, time);
     }
   }
 
-  private onGLTFLoaded(gltf: GLTF, scene: Scene): void {
+  onClick(intersections: Intersection[], scene: Scene, camera: Camera): void {
+    this.support.onClick(intersections, scene, camera);
+  }
+
+  private onGLTFLoaded(gltf: GLTF, scene: Scene, camera: Camera): void {
     this.gltf = gltf;
     scene.add(gltf.scene);
+    this.support.prepare(scene, camera);
   }
 }

@@ -1,7 +1,9 @@
-import { Scene } from "three";
+import { Camera, Intersection, Scene } from "three";
 
 export interface SceneSupport {
-  populate(scene: Scene): void;
+  prepare(scene: Scene, camera: Camera): void;
 
-  animate(scene: Scene, time: number): void;
+  animate(scene: Scene, camera: Camera, time: number): void;
+
+  onClick(intersections: Intersection[], scene: Scene, camera: Camera): void;
 }

@@ -1,16 +1,12 @@
 import {
   Material,
-  Mesh,
   MeshPhongMaterial,
-  Object3D,
   PointLight,
   Texture,
   Vector3,
 } from "three";
 import { GLTFSceneSupport } from "./GLFTSceneSupport";
 import { SceneSupport } from "./SceneSupport";
-
-const intersectables: Mesh[] = [];
 
 export const Utils3d = {
   startWithGLTF(
@@ -50,19 +46,5 @@ export const Utils3d = {
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
-  },
-
-  isIntersectable: function (mesh: Mesh) {
-    return intersectables.indexOf(mesh) > -1;
-  },
-
-  setIntersectable: function (mesh: Mesh) {
-    if (!this.isIntersectable(mesh)) {
-      intersectables.push(mesh);
-    }
-  },
-
-  getIntersectables: function (): Object3D[] {
-    return intersectables;
   },
 };

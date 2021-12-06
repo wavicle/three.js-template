@@ -1,23 +1,29 @@
 import * as THREE from "three";
 import $ from "jquery";
-import { init, animate, onClick } from "../custom/game-main";
+import { sceneSupport } from "../custom/game";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 
 import { Mesh, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from "three";
-import { Utils3d } from "./Utils3d";
+import { UI } from "./UI";
 
 let running: boolean = false;
 
 let renderer: WebGLRenderer, camera: PerspectiveCamera, scene: Scene;
 let pointerLockControls: PointerLockControls;
-let clicked: boolean;
 
 const raycaster = new THREE.Raycaster();
+let clicked: boolean = false;
+let previousMouseTarget: Mesh | undefined;
 
 $(function () {
-  clicked = false;
   window.addEventListener("click", function (event) {
-    processMouseClick();
+    if (running) {
+      clicked = true;
+    }
+    if (pointerLockControls && !pointerLockControls.isLocked) {
+      pointerLockControls.lock();
+      unlockGame();
+    }
   });
 
   const speed = 0.25;
@@ -57,40 +63,57 @@ $(function () {
   document.body.appendChild(renderer.domElement);
 
   initFromConfig();
-  init(scene, camera);
+  sceneSupport.prepare(scene, camera);
 });
 
 function animateIfNeeded(time: number): void {
   if (running) {
-    processMouseEvents();
-    animate(time, scene, camera);
+    animateWithMouse();
+    sceneSupport.animate(scene, camera, time);
     renderer.render(scene, camera);
   }
 }
 
-function processMouseClick() {
-  if (running) {
-    clicked = true;
-  }
-  if (pointerLockControls && !pointerLockControls.isLocked) {
-    pointerLockControls.lock();
-    unlockGame();
-  }
-}
+function animateWithMouse() {
+  raycaster.set(camera.position, camera.getWorldDirection(new Vector3()));
+  const intersections = raycaster.intersectObjects(UI.getIntersectables());
 
-function processMouseEvents() {
-  if (clicked) {
-    clicked = false;
-    raycaster.set(camera.position, camera.getWorldDirection(new Vector3()));
-    const intersections = raycaster.intersectObjects(
-      scene.children
-        .filter((it) => it instanceof Mesh)
-        .filter((it) => Utils3d.isIntersectable(it as Mesh))
-    );
-    if (intersections && intersections.length > 0) {
-      onClick(intersections);
+  type MouseEventType = { code: "enter" | "leave" | "click"; target: Mesh };
+  let mouseEvents: MouseEventType[] = [];
+  if (intersections && intersections.length > 0) {
+    const target = intersections[0].object as Mesh;
+    if (clicked) {
+      clicked = false;
+      mouseEvents.push({ code: "click", target: target });
+    } else if (previousMouseTarget) {
+      if (previousMouseTarget != target) {
+        mouseEvents.push({ code: "leave", target: previousMouseTarget });
+        mouseEvents.push({ code: "enter", target: target });
+      }
+    } else {
+      mouseEvents.push({ code: "enter", target: target });
     }
+    previousMouseTarget = target;
+  } else if (previousMouseTarget) {
+    mouseEvents.push({ code: "leave", target: previousMouseTarget });
+    previousMouseTarget = undefined;
   }
+
+  mouseEvents.forEach((mouseEvent) => {
+    let handler: (() => void) | undefined = undefined;
+    const code = mouseEvent.code;
+    const target = mouseEvent.target;
+    if (code == "click") {
+      handler = UI.getClickHandler(target);
+    } else if (code == "leave") {
+      handler = UI.getMouseLeaveHandler(target);
+    } else if (code == "enter") {
+      handler = UI.getMouseEnterHandler(target);
+    }
+    if (handler) {
+      handler();
+    }
+  });
 }
 
 function initFromConfig() {
