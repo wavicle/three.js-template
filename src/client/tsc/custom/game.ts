@@ -5,8 +5,10 @@ import {
   HemisphereLight,
   Intersection,
   Mesh,
+  MeshNormalMaterial,
   Object3D,
   Scene,
+  SphereGeometry,
   Vector3,
 } from "three";
 import { SceneSupport } from "../framework/SceneSupport";
@@ -31,6 +33,8 @@ class BasicSceneSupport implements SceneSupport {
       Utils3d.coloredMaterial("#FF0000")
     );
     cube.name = "cube";
+    cube.position.x = 3;
+    cube.position.y = 1;
     scene.add(cube);
 
     UI.onClick(scene.getObjectByName("Suzanne") as Mesh, () => {
@@ -46,6 +50,24 @@ class BasicSceneSupport implements SceneSupport {
     UI.onMouseLeave(scene.getObjectByName("cube") as Mesh, () => {
       (scene.getObjectByName("cube") as Mesh).material =
         Utils3d.coloredMaterial("#FF0000");
+    });
+
+    var sphere = new Mesh(new SphereGeometry(1), new MeshNormalMaterial());
+    sphere.name = "sphere";
+    sphere.position.x = -3;
+    sphere.position.z = 2;
+    scene.add(sphere);
+
+    UI.onMouseEnter(sphere, () => {
+      UI.showPrompt("Press any key to change color");
+    });
+    UI.onMouseLeave(sphere, () => {
+      UI.hidePrompt();
+    });
+
+    UI.onKeyPress(sphere, () => {
+      (scene.getObjectByName("sphere") as Mesh).material =
+        Utils3d.coloredMaterial(Utils3d.getRandomColor());
     });
   }
 

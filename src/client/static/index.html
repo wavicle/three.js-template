@@ -8,13 +8,13 @@
         overflow: hidden;
         cursor: pointer;
       }
-      #pointerLockPrompt {
+      #prompt {
         display: none;
         font-size: 16pt;
         color: white;
         padding: 20px;
         background-color: rgba(0, 0, 0, 0.5);
-        border-radius: 10%;
+        border-radius: 20%;
       }
       #personCursor {
         display: none;
@@ -34,12 +34,7 @@
     </style>
   </head>
   <body>
-    <div id="pointerLockPrompt" class="centered">
-      Click anywhere to continue
-    </div>
-    <div id="pointerLockPrompt" class="centered">
-      Click anywhere to continue
-    </div>
+    <div id="prompt" class="centered">Click anywhere to continue</div>
     <div id="personCursor" class="centered">.</div>
     <div id="webgl-output"></div>
   </body>

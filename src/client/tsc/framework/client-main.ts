@@ -3,8 +3,16 @@ import $ from "jquery";
 import { sceneSupport } from "../custom/game";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 
-import { Mesh, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from "three";
+import {
+  Intersection,
+  Mesh,
+  PerspectiveCamera,
+  Scene,
+  Vector3,
+  WebGLRenderer,
+} from "three";
 import { UI } from "./UI";
+import { Utils3d } from "./Utils3d";
 
 let running: boolean = false;
 
@@ -13,7 +21,9 @@ let pointerLockControls: PointerLockControls;
 
 const raycaster = new THREE.Raycaster();
 let clicked: boolean = false;
+let pressedKeyCode: undefined | string = undefined;
 let previousMouseTarget: Mesh | undefined;
+let previousKeyboardTarget: Mesh | undefined;
 
 $(function () {
   window.addEventListener("click", function (event) {
@@ -40,6 +50,9 @@ $(function () {
         break;
       case "KeyD":
         pointerLockControls.moveRight(speed);
+        break;
+      default:
+        pressedKeyCode = event.code;
         break;
     }
   });
@@ -68,20 +81,47 @@ $(function () {
 
 function animateIfNeeded(time: number): void {
   if (running) {
-    animateWithMouse();
+    animateWithUI();
     sceneSupport.animate(scene, camera, time);
     renderer.render(scene, camera);
   }
 }
 
-function animateWithMouse() {
-  raycaster.set(camera.position, camera.getWorldDirection(new Vector3()));
-  const intersections = raycaster.intersectObjects(UI.getIntersectables());
+type MouseEventType = { code: "enter" | "leave" | "click"; target: Mesh };
 
-  type MouseEventType = { code: "enter" | "leave" | "click"; target: Mesh };
+function animateWithUI() {
+  raycaster.set(camera.position, camera.getWorldDirection(new Vector3()));
+
+  const intersections = raycaster.intersectObjects(scene.children, true) || [];
+  let target: undefined | Mesh = undefined;
+  if (intersections.length > 0) {
+    const firstIntersection = intersections[0];
+    const firstObject = firstIntersection.object;
+    if (
+      firstObject instanceof Mesh &&
+      UI.isIntersectable(firstObject as Mesh)
+    ) {
+      target = firstObject as Mesh;
+    }
+  }
+  animateWithKeyboard(target);
+  animateWithMouse(target);
+}
+
+function animateWithKeyboard(target: undefined | Mesh): void {
+  if (target && pressedKeyCode) {
+    const handler = UI.getKeyPressHandler(target);
+    if (handler) {
+      handler();
+    }
+  }
+  previousKeyboardTarget = target;
+  pressedKeyCode = undefined;
+}
+
+function animateWithMouse(target: undefined | Mesh): void {
   let mouseEvents: MouseEventType[] = [];
-  if (intersections && intersections.length > 0) {
-    const target = intersections[0].object as Mesh;
+  if (target) {
     if (clicked) {
       clicked = false;
       mouseEvents.push({ code: "click", target: target });
@@ -93,11 +133,12 @@ function animateWithMouse() {
     } else {
       mouseEvents.push({ code: "enter", target: target });
     }
-    previousMouseTarget = target;
-  } else if (previousMouseTarget) {
-    mouseEvents.push({ code: "leave", target: previousMouseTarget });
-    previousMouseTarget = undefined;
+  } else {
+    if (previousMouseTarget) {
+      mouseEvents.push({ code: "leave", target: previousMouseTarget });
+    }
   }
+  previousMouseTarget = target;
 
   mouseEvents.forEach((mouseEvent) => {
     let handler: (() => void) | undefined = undefined;
@@ -126,16 +167,15 @@ function initFromConfig() {
 
 function lockGame() {
   running = false;
-  (document.getElementById("pointerLockPrompt") as HTMLElement).style.display =
-    "block";
+  UI.showPrompt("Click anywhere to continue");
   (document.getElementById("personCursor") as HTMLElement).style.display =
     "none";
 }
 
 function unlockGame() {
-  running = true;
-  (document.getElementById("pointerLockPrompt") as HTMLElement).style.display =
-    "none";
+  UI.hidePrompt();
+  (document.getElementById("prompt") as HTMLElement).style.display = "none";
   (document.getElementById("personCursor") as HTMLElement).style.display =
     "block";
+  running = true;
 }
