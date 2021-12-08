@@ -28,10 +28,6 @@ export class GLTFSceneSupport implements SceneSupport {
     }
   }
 
-  onClick(intersections: Intersection[], scene: Scene, camera: Camera): void {
-    this.support.onClick(intersections, scene, camera);
-  }
-
   private onGLTFLoaded(gltf: GLTF, scene: Scene, camera: Camera): void {
     this.gltf = gltf;
     scene.add(gltf.scene);

@@ -1,12 +1,9 @@
 import {
   BoxGeometry,
   Camera,
-  Event,
   HemisphereLight,
-  Intersection,
   Mesh,
   MeshNormalMaterial,
-  Object3D,
   Scene,
   SphereGeometry,
   Vector3,
@@ -76,15 +73,6 @@ class BasicSceneSupport implements SceneSupport {
 
   animate(scene: Scene, camera: Camera, time: number): void {
     (scene.getObjectByName("Suzanne") as Mesh).rotation.y += 0.01;
-  }
-
-  onClick(
-    intersections: Intersection<Object3D<Event>>[],
-    scene: Scene,
-    camera: Camera
-  ): void {
-    const mesh = intersections[0].object as Mesh;
-    mesh.material = Utils3d.coloredMaterial(Utils3d.getRandomColor());
   }
 }
 

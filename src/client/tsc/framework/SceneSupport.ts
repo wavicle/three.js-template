@@ -4,6 +4,4 @@ export interface SceneSupport {
   prepare(scene: Scene, camera: Camera): void;
 
   animate(scene: Scene, camera: Camera, time: number): void;
-
-  onClick(intersections: Intersection[], scene: Scene, camera: Camera): void;
 }
