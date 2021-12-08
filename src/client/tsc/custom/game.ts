@@ -13,7 +13,7 @@ import {
 } from "three";
 import { SceneSupport } from "../framework/SceneSupport";
 import { Utils3d } from "../framework/Utils3d";
-import { UI } from "../framework/UI";
+import { KeyPressEvent, UI } from "../framework/UI";
 
 class BasicSceneSupport implements SceneSupport {
   prepare(scene: Scene, camera: Camera): void {
@@ -59,15 +59,18 @@ class BasicSceneSupport implements SceneSupport {
     scene.add(sphere);
 
     UI.onMouseEnter(sphere, () => {
-      UI.showPrompt("Press any key to change color");
+      UI.showTooltip("Press [F] to change color");
     });
     UI.onMouseLeave(sphere, () => {
-      UI.hidePrompt();
+      UI.hideTooltip();
     });
 
-    UI.onKeyPress(sphere, () => {
-      (scene.getObjectByName("sphere") as Mesh).material =
-        Utils3d.coloredMaterial(Utils3d.getRandomColor());
+    UI.onKeyPress(sphere, (e: KeyPressEvent) => {
+      if (e.keys[0] == "KeyF") {
+        (e.intersection.object as Mesh).material = Utils3d.coloredMaterial(
+          Utils3d.getRandomColor()
+        );
+      }
     });
   }
 

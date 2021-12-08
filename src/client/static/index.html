@@ -1,22 +1,44 @@
 <html>
   <head>
     <title>Three.js template</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Just+Another+Hand&display=swap"
+      rel="stylesheet"
+    />
     <script src="client-bundle.js"></script>
     <style>
       body {
         margin: 0px;
         overflow: hidden;
         cursor: pointer;
+        font-family: "Just Another Hand", cursive;
       }
-      #prompt {
+      .outputCanvas {
+        position: absolute;
+        z-index: 1;
+      }
+      #tooltip {
         display: none;
-        font-size: 16pt;
+        margin-top: -50px;
+        margin-left: 150px;
+        font-size: 32px;
+        padding: 20px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+      }
+      #pointerLockPrompt {
+        display: none;
+        z-index: 2;
+        font-size: 64px;
         color: white;
         padding: 20px;
         background-color: rgba(0, 0, 0, 0.5);
-        border-radius: 20%;
+        border-radius: 5%;
       }
       #personCursor {
+        z-index: 3;
         display: none;
         font-size: 20pt;
         color: white;
@@ -34,8 +56,11 @@
     </style>
   </head>
   <body>
-    <div id="prompt" class="centered">Click anywhere to continue</div>
+    <canvas id="outputCanvas"></canvas>
+    <div id="pointerLockPrompt" class="centered">
+      Click anywhere to continue
+    </div>
+    <div id="tooltip" class="centered"></div>
     <div id="personCursor" class="centered">.</div>
-    <div id="webgl-output"></div>
   </body>
 </html>

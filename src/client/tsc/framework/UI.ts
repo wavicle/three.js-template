@@ -1,10 +1,28 @@
-import { Mesh } from "three";
+import { Intersection, Mesh } from "three";
+
+export interface UIEvent {
+  intersection: Intersection;
+}
+
+export interface KeyboardEvent extends UIEvent {
+  keys: string[];
+}
+
+export interface KeyPressEvent extends KeyboardEvent {}
+
+export interface MouseEvent extends UIEvent {}
+
+export interface MouseClickEvent extends MouseEvent {}
+
+export interface MouseEnterEvent extends MouseEvent {}
+
+export interface MouseLeaveEvent extends MouseEvent {}
 
 const intersectables: Mesh[] = [];
 const clickHandlers: Map<Mesh, () => void> = new Map();
 const mouseEnterHandlers: Map<Mesh, () => void> = new Map();
 const mouseLeaveHandlers: Map<Mesh, () => void> = new Map();
-const keyPressHandlers: Map<Mesh, () => void> = new Map();
+const keyPressHandlers: Map<Mesh, (e: KeyPressEvent) => void> = new Map();
 
 export const UI = {
   onClick: function (mesh: Mesh, handler: () => void): void {
@@ -22,7 +40,7 @@ export const UI = {
     intersectables.push(mesh);
   },
 
-  onKeyPress: function (mesh: Mesh, handler: () => void): void {
+  onKeyPress: function (mesh: Mesh, handler: (e: KeyPressEvent) => void): void {
     keyPressHandlers.set(mesh, handler);
     intersectables.push(mesh);
   },
@@ -47,18 +65,18 @@ export const UI = {
     return mouseLeaveHandlers.get(mesh) as () => void;
   },
 
-  getKeyPressHandler: function (mesh: Mesh): () => void {
+  getKeyPressHandler: function (mesh: Mesh): (e: KeyPressEvent) => void {
     return keyPressHandlers.get(mesh) as () => void;
   },
 
-  showPrompt: function (html: string) {
-    const promptElement = document.getElementById("prompt") as HTMLElement;
+  showTooltip: function (html: string) {
+    const promptElement = document.getElementById("tooltip") as HTMLElement;
     promptElement.innerHTML = html;
     promptElement.style.display = "block";
   },
 
-  hidePrompt: function () {
-    const promptElement = document.getElementById("prompt") as HTMLElement;
+  hideTooltip: function () {
+    const promptElement = document.getElementById("tooltip") as HTMLElement;
     promptElement.innerHTML = "";
     promptElement.style.display = "none";
   },
