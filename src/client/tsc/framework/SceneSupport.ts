@@ -1,4 +1,4 @@
-import { Camera, Intersection, Scene } from "three";
+import { Camera, Scene } from "three";
 
 export interface SceneSupport {
   prepare(scene: Scene, camera: Camera): void;

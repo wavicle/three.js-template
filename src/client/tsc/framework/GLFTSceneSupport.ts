@@ -1,4 +1,4 @@
-import { Camera, Event, Intersection, Object3D, Scene } from "three";
+import { Camera, Mesh, Scene } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { SceneSupport } from "./SceneSupport";
 
@@ -30,6 +30,12 @@ export class GLTFSceneSupport implements SceneSupport {
 
   private onGLTFLoaded(gltf: GLTF, scene: Scene, camera: Camera): void {
     this.gltf = gltf;
+    gltf.scene.traverse(function (node) {
+      if (node instanceof Mesh) {
+        node.castShadow = true;
+        node.receiveShadow = true;
+      }
+    });
     scene.add(gltf.scene);
     this.support.prepare(scene, camera);
   }
