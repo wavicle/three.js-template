@@ -100,10 +100,10 @@ function animateWithUI() {
   if (intersections.length > 0) {
     firstIntersection = intersections[0];
     const firstObject = firstIntersection.object;
-    if (
-      firstObject instanceof Mesh &&
-      UI.isIntersectable(firstObject as Mesh)
-    ) {
+    const intersectable =
+      firstObject instanceof Mesh && UI.isIntersectable(firstObject as Mesh);
+    const closeEnough = firstIntersection.distance <= 5;
+    if (intersectable && closeEnough) {
       target = firstObject as Mesh;
     }
   }
@@ -135,7 +135,6 @@ function animateWithMouse(
   let mouseEvents: MouseEventType[] = [];
   if (target) {
     if (clicked) {
-      clicked = false;
       mouseEvents.push({ code: "click", target: target });
     } else if (previousMouseTarget) {
       if (previousMouseTarget != target) {
@@ -150,6 +149,7 @@ function animateWithMouse(
       mouseEvents.push({ code: "leave", target: previousMouseTarget });
     }
   }
+  clicked = false;
   previousMouseTarget = target;
 
   mouseEvents.forEach((mouseEvent) => {
