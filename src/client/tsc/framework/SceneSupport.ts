@@ -1,7 +1,7 @@
-import { Camera, Scene } from "three";
+import { Camera, Clock, Scene } from "three";
 
 export interface SceneSupport {
   prepare(scene: Scene, camera: Camera): void;
 
-  animate(scene: Scene, camera: Camera, time: number): void;
+  animate(scene: Scene, camera: Camera, clock: Clock): void;
 }

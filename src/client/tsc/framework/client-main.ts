@@ -4,6 +4,7 @@ import { sceneSupport } from "../custom/game";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 
 import {
+  Clock,
   Intersection,
   Mesh,
   PerspectiveCamera,
@@ -67,6 +68,7 @@ $(function () {
     antialias: true,
     canvas: document.getElementById("outputCanvas") as HTMLElement,
   });
+  renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   window.addEventListener("resize", function () {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -75,15 +77,15 @@ $(function () {
   });
   renderer.shadowMap.enabled = true;
   renderer.setAnimationLoop(animateIfNeeded);
-
   initFromConfig();
   sceneSupport.prepare(scene, camera);
 });
 
-function animateIfNeeded(time: number): void {
+const clock = new Clock();
+function animateIfNeeded(): void {
   if (running) {
     animateWithUI();
-    sceneSupport.animate(scene, camera, time);
+    sceneSupport.animate(scene, camera, clock);
     renderer.render(scene, camera);
   }
 }

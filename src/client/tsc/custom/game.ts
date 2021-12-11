@@ -1,4 +1,4 @@
-import { Camera, HemisphereLight, Mesh, Scene, Vector3 } from "three";
+import { Camera, Clock, HemisphereLight, Mesh, Scene, Vector3 } from "three";
 import { SceneSupport } from "../framework/SceneSupport";
 import { Utils3d } from "../framework/Utils3d";
 import { KeyPressEvent, UI } from "../framework/UI";
@@ -49,8 +49,9 @@ class BasicSceneSupport implements SceneSupport {
     });
   }
 
-  animate(scene: Scene, camera: Camera, time: number): void {
-    (scene.getObjectByName("Suzanne") as Mesh).rotation.y += 0.01;
+  animate(scene: Scene, camera: Camera, clock: Clock): void {
+    (scene.getObjectByName("Suzanne") as Mesh).rotation.y +=
+      clock.getDelta() * 0.5;
   }
 }
 

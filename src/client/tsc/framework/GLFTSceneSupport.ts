@@ -1,4 +1,4 @@
-import { Camera, Mesh, Scene } from "three";
+import { Camera, Clock, Mesh, Scene } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { SceneSupport } from "./SceneSupport";
 
@@ -22,9 +22,9 @@ export class GLTFSceneSupport implements SceneSupport {
     );
   }
 
-  animate(scene: Scene, camera: Camera, time: number): void {
+  animate(scene: Scene, camera: Camera, clock: Clock): void {
     if (this.gltf) {
-      this.support.animate(scene, camera, time);
+      this.support.animate(scene, camera, clock);
     }
   }
 
