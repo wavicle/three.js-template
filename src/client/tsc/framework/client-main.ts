@@ -75,7 +75,6 @@ $(function () {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
-  renderer.shadowMap.enabled = true;
   renderer.setAnimationLoop(animateIfNeeded);
   initFromConfig();
   sceneSupport.prepare(scene, camera);

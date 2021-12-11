@@ -17,20 +17,11 @@ class BasicSceneSupport implements SceneSupport {
     );
 
     const suzanne = scene.getObjectByName("Suzanne") as Mesh;
-    const cube = scene.getObjectByName("Cube") as Mesh;
     const sphere = scene.getObjectByName("Sphere") as Mesh;
 
     UI.onClick(suzanne, () => {
       (scene.getObjectByName("Suzanne") as Mesh).material =
         Utils3d.coloredMaterial(Utils3d.getRandomColor());
-    });
-
-    UI.onMouseEnter(cube as Mesh, () => {
-      (cube as Mesh).material = Utils3d.coloredMaterial("#FFFF00");
-    });
-
-    UI.onMouseLeave(cube as Mesh, () => {
-      (cube as Mesh).material = Utils3d.coloredMaterial("#FF0000");
     });
 
     UI.onMouseEnter(sphere, () => {
