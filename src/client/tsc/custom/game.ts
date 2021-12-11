@@ -23,6 +23,12 @@ class BasicSceneSupport implements SceneSupport {
       (scene.getObjectByName("Suzanne") as Mesh).material =
         Utils3d.coloredMaterial(Utils3d.getRandomColor());
     });
+    UI.onMouseEnter(suzanne, () => {
+      UI.showTooltip("Click to change color");
+    });
+    UI.onMouseLeave(suzanne, () => {
+      UI.hideTooltip();
+    });
 
     UI.onMouseEnter(sphere, () => {
       UI.showTooltip("Press [F] to change color");
