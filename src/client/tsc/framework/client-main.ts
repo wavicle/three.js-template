@@ -25,6 +25,11 @@ let pressedKeyCode: undefined | string = undefined;
 let previousMouseTarget: Mesh | undefined;
 let previousKeyboardTarget: Mesh | undefined;
 
+const moveSpeeds: { forward: number; right: number } = {
+  forward: 0,
+  right: 0,
+};
+
 $(function () {
   window.addEventListener("click", function (event) {
     if (running) {
@@ -40,16 +45,16 @@ $(function () {
   window.addEventListener("keypress", function (event) {
     switch (event.code) {
       case "KeyW":
-        pointerLockControls.moveForward(speed);
+        moveSpeeds.forward = speed;
         break;
       case "KeyS":
-        pointerLockControls.moveForward(-speed);
+        moveSpeeds.forward = -speed;
         break;
       case "KeyA":
-        pointerLockControls.moveRight(-speed);
+        moveSpeeds.right = -speed;
         break;
       case "KeyD":
-        pointerLockControls.moveRight(speed);
+        moveSpeeds.right = speed;
         break;
       default:
         pressedKeyCode = event.code;
@@ -91,7 +96,16 @@ function animateIfNeeded(): void {
 
 type MouseEventType = { code: "enter" | "leave" | "click"; target: Mesh };
 
+function moveCamera() {
+  const delta = clock.getDelta();
+  pointerLockControls.moveForward(moveSpeeds.forward * delta * 100);
+  pointerLockControls.moveRight(moveSpeeds.right * delta * 100);
+  moveSpeeds.forward = 0;
+  moveSpeeds.right = 0;
+}
+
 function animateWithUI() {
+  moveCamera();
   raycaster.set(camera.position, camera.getWorldDirection(new Vector3()));
 
   let firstIntersection: undefined | Intersection;
