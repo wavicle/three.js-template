@@ -25,10 +25,18 @@ let pressedKeyCode: undefined | string = undefined;
 let previousMouseTarget: Mesh | undefined;
 let previousKeyboardTarget: Mesh | undefined;
 
-const moveSpeeds: { forward: number; right: number } = {
-  forward: 0,
-  right: 0,
+const movements: {
+  forward: boolean;
+  backward: boolean;
+  left: boolean;
+  right: boolean;
+} = {
+  forward: false,
+  backward: false,
+  left: false,
+  right: false,
 };
+const speed = 0.15;
 
 $(function () {
   window.addEventListener("click", function (event) {
@@ -41,20 +49,38 @@ $(function () {
     }
   });
 
-  const speed = 0.25;
-  window.addEventListener("keypress", function (event) {
+  window.addEventListener("keydown", function (event) {
     switch (event.code) {
       case "KeyW":
-        moveSpeeds.forward = speed;
+        movements.forward = true;
         break;
       case "KeyS":
-        moveSpeeds.forward = -speed;
+        movements.backward = true;
         break;
       case "KeyA":
-        moveSpeeds.right = -speed;
+        movements.left = true;
         break;
       case "KeyD":
-        moveSpeeds.right = speed;
+        movements.right = true;
+        break;
+      default:
+        pressedKeyCode = event.code;
+        break;
+    }
+  });
+  window.addEventListener("keyup", function (event) {
+    switch (event.code) {
+      case "KeyW":
+        movements.forward = false;
+        break;
+      case "KeyS":
+        movements.backward = false;
+        break;
+      case "KeyA":
+        movements.left = false;
+        break;
+      case "KeyD":
+        movements.right = false;
         break;
       default:
         pressedKeyCode = event.code;
@@ -98,10 +124,18 @@ type MouseEventType = { code: "enter" | "leave" | "click"; target: Mesh };
 
 function moveCamera() {
   const delta = clock.getDelta();
-  pointerLockControls.moveForward(moveSpeeds.forward * delta * 100);
-  pointerLockControls.moveRight(moveSpeeds.right * delta * 100);
-  moveSpeeds.forward = 0;
-  moveSpeeds.right = 0;
+  const fwdMovement = movements.forward
+    ? speed * delta * 100
+    : movements.backward
+    ? -speed * delta * 100
+    : 0;
+  const rightMovement = movements.right
+    ? speed * delta * 100
+    : movements.left
+    ? -speed * delta * 100
+    : 0;
+  pointerLockControls.moveForward(fwdMovement);
+  pointerLockControls.moveRight(rightMovement);
 }
 
 function animateWithUI() {
