@@ -22,6 +22,7 @@ let pointerLockControls: PointerLockControls;
 const raycaster = new THREE.Raycaster();
 let clicked: boolean = false;
 let pressedKeyCode: undefined | string = undefined;
+let releasedKeyCode: undefined | string = undefined;
 let previousMouseTarget: Mesh | undefined;
 let previousKeyboardTarget: Mesh | undefined;
 
@@ -83,7 +84,7 @@ $(function () {
         movements.right = false;
         break;
       default:
-        pressedKeyCode = event.code;
+        releasedKeyCode = event.code;
         break;
     }
   });
