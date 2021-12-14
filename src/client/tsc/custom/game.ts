@@ -20,8 +20,7 @@ class BasicSceneSupport implements SceneSupport {
     const sphere = scene.getObjectByName("Sphere") as Mesh;
 
     UI.onClick(suzanne, () => {
-      (scene.getObjectByName("Suzanne") as Mesh).material =
-        Utils3d.coloredMaterial(Utils3d.getRandomColor());
+      suzanne.material = Utils3d.coloredMaterial(Utils3d.getRandomColor());
     });
     UI.onMouseEnter(suzanne, () => {
       UI.showTooltip("Click to change color");
