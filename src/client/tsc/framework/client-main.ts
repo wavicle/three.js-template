@@ -19,7 +19,7 @@ let running: boolean = false;
 let renderer: WebGLRenderer, camera: PerspectiveCamera, scene: Scene;
 let pointerLockControls: PointerLockControls;
 
-const raycaster = new THREE.Raycaster();
+let eyeHeight: number;
 let clicked: boolean = false;
 let pressedKeyCode: undefined | string = undefined;
 let releasedKeyCode: undefined | string = undefined;
@@ -114,6 +114,9 @@ $(function () {
 
 const clock = new Clock();
 function animateIfNeeded(): void {
+  if (!eyeHeight) {
+    eyeHeight = camera.position.y;
+  }
   if (running) {
     animateWithUI();
     sceneSupport.animate(scene, camera, clock);
@@ -123,6 +126,7 @@ function animateIfNeeded(): void {
 
 type MouseEventType = { code: "enter" | "leave" | "click"; target: Mesh };
 
+const whisker = new THREE.Raycaster();
 function moveCamera() {
   const delta = clock.getDelta();
   const fwdMovement = movements.forward
@@ -135,10 +139,40 @@ function moveCamera() {
     : movements.left
     ? -speed * delta * 100
     : 0;
+
+  if (fwdMovement != 0 || rightMovement != 0) {
+    const oldY = camera.position.y;
+    const laterDistance = getWhiskerDistance(fwdMovement, rightMovement);
+    if (laterDistance > 0) {
+      camera.position.y = oldY + eyeHeight - laterDistance;
+    }
+  }
   pointerLockControls.moveForward(fwdMovement);
   pointerLockControls.moveRight(rightMovement);
 }
 
+function getWhiskerDistance(
+  fwdMovement: number,
+  rightMovement: number
+): number {
+  whisker.set(
+    new Vector3(
+      camera.position.x + rightMovement,
+      camera.position.y,
+      camera.position.z - fwdMovement
+    ),
+    new Vector3(0, -1, 0)
+  );
+  let intersections = whisker.intersectObjects(scene.children);
+  if (intersections && intersections.length > 0) {
+    const firstIntersection = intersections[0];
+    return firstIntersection.distance;
+  } else {
+    return 0;
+  }
+}
+
+const raycaster = new THREE.Raycaster();
 function animateWithUI() {
   moveCamera();
   raycaster.set(camera.position, camera.getWorldDirection(new Vector3()));
@@ -151,7 +185,7 @@ function animateWithUI() {
     const firstObject = firstIntersection.object;
     const intersectable =
       firstObject instanceof Mesh && UI.isIntersectable(firstObject as Mesh);
-    const closeEnough = firstIntersection.distance <= 5;
+    const closeEnough = firstIntersection.distance <= 10;
     if (intersectable && closeEnough) {
       target = firstObject as Mesh;
     }

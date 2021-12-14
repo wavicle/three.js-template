@@ -5,7 +5,7 @@ import { KeyPressEvent, UI } from "../framework/UI";
 
 class BasicSceneSupport implements SceneSupport {
   prepare(scene: Scene, camera: Camera): void {
-    camera.position.set(0, 6, 10);
+    camera.position.set(5, 6, 10);
 
     scene.add(new HemisphereLight("#FFFFFF", "#222222", 2));
     scene.add(
