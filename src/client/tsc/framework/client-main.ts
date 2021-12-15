@@ -126,7 +126,6 @@ function animateIfNeeded(): void {
 
 type MouseEventType = { code: "enter" | "leave" | "click"; target: Mesh };
 
-const whisker = new THREE.Raycaster();
 function moveCamera() {
   const delta = clock.getDelta();
   const fwdMovement = movements.forward
@@ -140,30 +139,24 @@ function moveCamera() {
     ? -speed * delta * 100
     : 0;
 
+  pointerLockControls.moveForward(fwdMovement);
+  pointerLockControls.moveRight(rightMovement);
   if (fwdMovement != 0 || rightMovement != 0) {
     const oldY = camera.position.y;
-    const laterDistance = getWhiskerDistance(fwdMovement, rightMovement);
+    const laterDistance = getEaglesEyeDistance();
     if (laterDistance > 0) {
       camera.position.y = oldY + eyeHeight - laterDistance;
     }
   }
-  pointerLockControls.moveForward(fwdMovement);
-  pointerLockControls.moveRight(rightMovement);
 }
 
-function getWhiskerDistance(
-  fwdMovement: number,
-  rightMovement: number
-): number {
-  whisker.set(
-    new Vector3(
-      camera.position.x + rightMovement,
-      camera.position.y,
-      camera.position.z - fwdMovement
-    ),
+const eaglesEye = new THREE.Raycaster();
+function getEaglesEyeDistance(): number {
+  eaglesEye.set(
+    new Vector3(camera.position.x, camera.position.y, camera.position.z),
     new Vector3(0, -1, 0)
   );
-  let intersections = whisker.intersectObjects(scene.children);
+  let intersections = eaglesEye.intersectObjects(scene.children);
   if (intersections && intersections.length > 0) {
     const firstIntersection = intersections[0];
     return firstIntersection.distance;
@@ -185,7 +178,7 @@ function animateWithUI() {
     const firstObject = firstIntersection.object;
     const intersectable =
       firstObject instanceof Mesh && UI.isIntersectable(firstObject as Mesh);
-    const closeEnough = firstIntersection.distance <= 10;
+    const closeEnough = firstIntersection.distance <= eyeHeight;
     if (intersectable && closeEnough) {
       target = firstObject as Mesh;
     }
