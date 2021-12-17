@@ -13,6 +13,7 @@ import {
   WebGLRenderer,
 } from "three";
 import { UI } from "./UI";
+import { FirstPerson } from "./FirstPerson";
 
 let running: boolean = false;
 
@@ -126,42 +127,14 @@ function animateIfNeeded(): void {
 
 type MouseEventType = { code: "enter" | "leave" | "click"; target: Mesh };
 
+let firstPerson: FirstPerson;
 function moveCamera() {
-  const delta = clock.getDelta();
-  const fwdMovement = movements.forward
-    ? speed * delta * 100
-    : movements.backward
-    ? -speed * delta * 100
-    : 0;
-  const rightMovement = movements.right
-    ? speed * delta * 100
-    : movements.left
-    ? -speed * delta * 100
-    : 0;
-
-  pointerLockControls.moveForward(fwdMovement);
-  pointerLockControls.moveRight(rightMovement);
-  if (fwdMovement != 0 || rightMovement != 0) {
-    const oldY = camera.position.y;
-    const laterDistance = getEaglesEyeDistance();
-    if (laterDistance > 0) {
-      camera.position.y = oldY + eyeHeight - laterDistance;
+  if (!firstPerson) {
+    if (eyeHeight) {
+      firstPerson = new FirstPerson(pointerLockControls, eyeHeight, speed, 1);
     }
-  }
-}
-
-const eaglesEye = new THREE.Raycaster();
-function getEaglesEyeDistance(): number {
-  eaglesEye.set(
-    new Vector3(camera.position.x, camera.position.y, camera.position.z),
-    new Vector3(0, -1, 0)
-  );
-  let intersections = eaglesEye.intersectObjects(scene.children);
-  if (intersections && intersections.length > 0) {
-    const firstIntersection = intersections[0];
-    return firstIntersection.distance;
   } else {
-    return 0;
+    firstPerson.moveFirstPerson(movements, clock.getDelta(), scene.children);
   }
 }
 
