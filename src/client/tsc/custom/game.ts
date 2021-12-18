@@ -5,14 +5,14 @@ import { KeyPressEvent, UI } from "../framework/UI";
 
 class BasicSceneSupport implements SceneSupport {
   prepare(scene: Scene, camera: Camera): void {
-    camera.position.set(5, 7, 10);
+    camera.position.set(-4, 7, 40);
 
     scene.add(new HemisphereLight("#FFFFFF", "#222222", 0.5));
     scene.add(
       Utils3d.pointLight({
         color: "#FFFFFF",
-        intensity: 0.5,
-        position: new Vector3(0, 10, 0),
+        intensity: 1,
+        position: new Vector3(0, 40, 0),
       })
     );
 
