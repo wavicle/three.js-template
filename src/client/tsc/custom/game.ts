@@ -7,11 +7,11 @@ class BasicSceneSupport implements SceneSupport {
   prepare(scene: Scene, camera: Camera): void {
     camera.position.set(5, 7, 10);
 
-    scene.add(new HemisphereLight("#FFFFFF", "#222222", 2));
+    scene.add(new HemisphereLight("#FFFFFF", "#222222", 0.5));
     scene.add(
       Utils3d.pointLight({
         color: "#FFFFFF",
-        intensity: 1,
+        intensity: 0.5,
         position: new Vector3(0, 10, 0),
       })
     );
@@ -47,7 +47,7 @@ class BasicSceneSupport implements SceneSupport {
 
   animate(scene: Scene, camera: Camera, clock: Clock): void {
     (scene.getObjectByName("Suzanne") as Mesh).rotation.y +=
-      clock.getDelta() * 0.5;
+      clock.getDelta() * 20;
   }
 
   getEyeHeight(): number {
