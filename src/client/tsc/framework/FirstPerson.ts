@@ -28,7 +28,7 @@ export class FirstPerson {
   private getUpStepPosition(camera: Camera): Vector3 {
     return new Vector3(
       camera.position.x,
-      camera.position.y + this.wiggleRoom,
+      camera.position.y - this.eyeHeight + this.wiggleRoom,
       camera.position.z
     );
   }
@@ -40,12 +40,14 @@ export class FirstPerson {
   private getClearanceForward(camera: Camera, objects: Object3D[]): number {
     const dir = new Vector3();
     camera.getWorldDirection(dir);
+    dir.setY(0).normalize();
     return this.getDistance(this.getUpStepPosition(camera), objects, dir);
   }
 
   private getClearanceBackward(camera: Camera, objects: Object3D[]): number {
     const dir = new Vector3();
     camera.getWorldDirection(dir);
+    dir.setY(0).normalize();
     return this.getDistance(
       this.getUpStepPosition(camera),
       objects,
@@ -56,6 +58,7 @@ export class FirstPerson {
   private getClearanceLeft(camera: Camera, objects: Object3D[]): number {
     const dir = new Vector3(-1, 0, 0);
     dir.applyMatrix4(camera.matrix);
+    dir.setY(0);
     dir.normalize();
     return this.getDistance(this.getUpStepPosition(camera), objects, dir);
   }
@@ -63,6 +66,7 @@ export class FirstPerson {
   private getClearanceRight(camera: Camera, objects: Object3D[]): number {
     const dir = new Vector3(1, 0, 0);
     dir.applyMatrix4(camera.matrix);
+    dir.setY(0);
     dir.normalize();
     return this.getDistance(this.getUpStepPosition(camera), objects, dir);
   }

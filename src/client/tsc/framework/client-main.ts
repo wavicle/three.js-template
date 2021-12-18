@@ -20,7 +20,6 @@ let running: boolean = false;
 let renderer: WebGLRenderer, camera: PerspectiveCamera, scene: Scene;
 let pointerLockControls: PointerLockControls;
 
-let eyeHeight: number;
 let clicked: boolean = false;
 let pressedKeyCode: undefined | string = undefined;
 let releasedKeyCode: undefined | string = undefined;
@@ -115,9 +114,6 @@ $(function () {
 
 const clock = new Clock();
 function animateIfNeeded(): void {
-  if (!eyeHeight) {
-    eyeHeight = camera.position.y;
-  }
   if (running) {
     animateWithUI();
     sceneSupport.animate(scene, camera, clock);
@@ -129,9 +125,15 @@ type MouseEventType = { code: "enter" | "leave" | "click"; target: Mesh };
 
 let firstPerson: FirstPerson;
 function moveCamera() {
+  const eyeHeight = sceneSupport.getEyeHeight();
   if (!firstPerson) {
     if (eyeHeight) {
-      firstPerson = new FirstPerson(pointerLockControls, eyeHeight, speed, 1);
+      firstPerson = new FirstPerson(
+        pointerLockControls,
+        eyeHeight,
+        speed,
+        0.25
+      );
     }
   } else {
     firstPerson.moveFirstPerson(movements, clock.getDelta(), scene.children);
@@ -151,7 +153,8 @@ function animateWithUI() {
     const firstObject = firstIntersection.object;
     const intersectable =
       firstObject instanceof Mesh && UI.isIntersectable(firstObject as Mesh);
-    const closeEnough = firstIntersection.distance <= eyeHeight;
+    const closeEnough =
+      firstIntersection.distance <= sceneSupport.getEyeHeight();
     if (intersectable && closeEnough) {
       target = firstObject as Mesh;
     }

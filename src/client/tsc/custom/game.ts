@@ -5,7 +5,7 @@ import { KeyPressEvent, UI } from "../framework/UI";
 
 class BasicSceneSupport implements SceneSupport {
   prepare(scene: Scene, camera: Camera): void {
-    camera.position.set(5, 6, 10);
+    camera.position.set(5, 7, 10);
 
     scene.add(new HemisphereLight("#FFFFFF", "#222222", 2));
     scene.add(
@@ -48,6 +48,10 @@ class BasicSceneSupport implements SceneSupport {
   animate(scene: Scene, camera: Camera, clock: Clock): void {
     (scene.getObjectByName("Suzanne") as Mesh).rotation.y +=
       clock.getDelta() * 0.5;
+  }
+
+  getEyeHeight(): number {
+    return 6;
   }
 }
 

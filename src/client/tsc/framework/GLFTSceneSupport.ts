@@ -39,4 +39,8 @@ export class GLTFSceneSupport implements SceneSupport {
     scene.add(gltf.scene);
     this.support.prepare(scene, camera);
   }
+
+  getEyeHeight(): number {
+    return this.support.getEyeHeight();
+  }
 }
