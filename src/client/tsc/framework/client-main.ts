@@ -3,15 +3,7 @@ import $ from "jquery";
 import { sceneSupport } from "../custom/game";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 
-import {
-  Clock,
-  Intersection,
-  Mesh,
-  PerspectiveCamera,
-  Scene,
-  Vector3,
-  WebGLRenderer,
-} from "three";
+import { Clock, Intersection, Mesh, Object3D, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from "three";
 import { UI } from "./UI";
 import { FirstPerson } from "./FirstPerson";
 
@@ -89,12 +81,7 @@ $(function () {
     }
   });
 
-  camera = new THREE.PerspectiveCamera(
-    70,
-    window.innerWidth / window.innerHeight,
-    0.01,
-    2000
-  );
+  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 2000);
   scene = new THREE.Scene();
   renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -128,12 +115,7 @@ function moveCamera() {
   const eyeHeight = sceneSupport.getEyeHeight();
   if (!firstPerson) {
     if (eyeHeight) {
-      firstPerson = new FirstPerson(
-        pointerLockControls,
-        eyeHeight,
-        speed,
-        0.25
-      );
+      firstPerson = new FirstPerson(pointerLockControls, eyeHeight, speed, 0.25);
     }
   } else {
     firstPerson.moveFirstPerson(movements, clock.getDelta(), scene.children);
@@ -146,15 +128,13 @@ function animateWithUI() {
   raycaster.set(camera.position, camera.getWorldDirection(new Vector3()));
 
   let firstIntersection: undefined | Intersection;
-  const intersections = raycaster.intersectObjects(scene.children, true) || [];
+  const intersections = raycaster.intersectObjects(getVisibles(), true) || [];
   let target: undefined | Mesh = undefined;
   if (intersections.length > 0) {
     firstIntersection = intersections[0];
     const firstObject = firstIntersection.object;
-    const intersectable =
-      firstObject instanceof Mesh && UI.isIntersectable(firstObject as Mesh);
-    const closeEnough =
-      firstIntersection.distance <= sceneSupport.getEyeHeight();
+    const intersectable = firstObject instanceof Mesh && UI.isIntersectable(firstObject as Mesh);
+    const closeEnough = firstIntersection.distance <= sceneSupport.getEyeHeight();
     if (intersectable && closeEnough) {
       target = firstObject as Mesh;
     }
@@ -163,10 +143,11 @@ function animateWithUI() {
   animateWithMouse(target, firstIntersection);
 }
 
-function animateWithKeyboard(
-  target: undefined | Mesh,
-  intersection: undefined | Intersection
-): void {
+function getVisibles(): Object3D[] {
+  return scene.getObjectByName("Visible")?.children || [];
+}
+
+function animateWithKeyboard(target: undefined | Mesh, intersection: undefined | Intersection): void {
   if (target && intersection && pressedKeyCode) {
     const handler = UI.getKeyPressHandler(target);
     if (handler) {
@@ -180,10 +161,7 @@ function animateWithKeyboard(
   pressedKeyCode = undefined;
 }
 
-function animateWithMouse(
-  target: undefined | Mesh,
-  intersection: undefined | Intersection
-): void {
+function animateWithMouse(target: undefined | Mesh, intersection: undefined | Intersection): void {
   let mouseEvents: MouseEventType[] = [];
   if (target) {
     if (clicked) {
@@ -234,14 +212,11 @@ function lockGame() {
   const element = document.getElementById("pointerLockPrompt") as HTMLElement;
   element.innerHTML = "Click anywhere to continue";
   element.style.display = "block";
-  (document.getElementById("personCursor") as HTMLElement).style.display =
-    "none";
+  (document.getElementById("personCursor") as HTMLElement).style.display = "none";
 }
 
 function unlockGame() {
-  (document.getElementById("pointerLockPrompt") as HTMLElement).style.display =
-    "none";
-  (document.getElementById("personCursor") as HTMLElement).style.display =
-    "block";
+  (document.getElementById("pointerLockPrompt") as HTMLElement).style.display = "none";
+  (document.getElementById("personCursor") as HTMLElement).style.display = "block";
   running = true;
 }

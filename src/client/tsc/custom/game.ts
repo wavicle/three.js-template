@@ -17,18 +17,15 @@ class BasicSceneSupport implements SceneSupport {
     );
 
     const suzanne = scene.getObjectByName("Suzanne") as Mesh;
-    const suzanneProxy = scene.getObjectByName("Suzanne_Proxy") as Mesh;
     const sphere = scene.getObjectByName("Sphere") as Mesh;
 
-    (suzanneProxy.material as Material).visible = false;
-
-    UI.onClick(suzanneProxy, () => {
+    UI.onClick(suzanne, () => {
       suzanne.material = Utils3d.coloredMaterial(Utils3d.getRandomColor());
     });
-    UI.onMouseEnter(suzanneProxy, () => {
+    UI.onMouseEnter(suzanne, () => {
       UI.showTooltip("Click to change color");
     });
-    UI.onMouseLeave(suzanneProxy, () => {
+    UI.onMouseLeave(suzanne, () => {
       UI.hideTooltip();
     });
 

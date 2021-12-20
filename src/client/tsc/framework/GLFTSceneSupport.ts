@@ -1,4 +1,4 @@
-import { Camera, Clock, Mesh, Scene } from "three";
+import { Camera, Clock, Material, Mesh, Scene } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { SceneSupport } from "./SceneSupport";
 
@@ -14,12 +14,7 @@ export class GLTFSceneSupport implements SceneSupport {
   ) {}
 
   prepare(scene: Scene, camera: Camera): void {
-    this.loader.load(
-      this.url,
-      (gltf) => this.onGLTFLoaded(gltf, scene, camera),
-      this.onLoadProgress,
-      this.onLoadError
-    );
+    this.loader.load(this.url, (gltf) => this.onGLTFLoaded(gltf, scene, camera), this.onLoadProgress, this.onLoadError);
   }
 
   animate(scene: Scene, camera: Camera, clock: Clock): void {
@@ -37,6 +32,15 @@ export class GLTFSceneSupport implements SceneSupport {
       }
     });
     scene.add(gltf.scene);
+    const invisibleOp = scene.getObjectByName("Invisible");
+    if (invisibleOp) {
+      const invisibles = invisibleOp as Mesh;
+      invisibles.children.forEach((it) => {
+        if (it instanceof Mesh) {
+          (it.material as Material).visible = false;
+        }
+      });
+    }
     this.support.prepare(scene, camera);
   }
 
