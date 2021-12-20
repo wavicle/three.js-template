@@ -1,4 +1,4 @@
-import { Camera, Clock, HemisphereLight, Mesh, Scene, Vector3 } from "three";
+import { Camera, Clock, HemisphereLight, Material, Mesh, Scene, Vector3 } from "three";
 import { SceneSupport } from "../framework/SceneSupport";
 import { Utils3d } from "../framework/Utils3d";
 import { KeyPressEvent, UI } from "../framework/UI";
@@ -17,15 +17,18 @@ class BasicSceneSupport implements SceneSupport {
     );
 
     const suzanne = scene.getObjectByName("Suzanne") as Mesh;
+    const suzanneProxy = scene.getObjectByName("Suzanne_Proxy") as Mesh;
     const sphere = scene.getObjectByName("Sphere") as Mesh;
 
-    UI.onClick(suzanne, () => {
+    (suzanneProxy.material as Material).visible = false;
+
+    UI.onClick(suzanneProxy, () => {
       suzanne.material = Utils3d.coloredMaterial(Utils3d.getRandomColor());
     });
-    UI.onMouseEnter(suzanne, () => {
+    UI.onMouseEnter(suzanneProxy, () => {
       UI.showTooltip("Click to change color");
     });
-    UI.onMouseLeave(suzanne, () => {
+    UI.onMouseLeave(suzanneProxy, () => {
       UI.hideTooltip();
     });
 
@@ -38,16 +41,13 @@ class BasicSceneSupport implements SceneSupport {
 
     UI.onKeyPress(sphere, (e: KeyPressEvent) => {
       if (e.keys[0] == "KeyF") {
-        (e.intersection.object as Mesh).material = Utils3d.coloredMaterial(
-          Utils3d.getRandomColor()
-        );
+        (e.intersection.object as Mesh).material = Utils3d.coloredMaterial(Utils3d.getRandomColor());
       }
     });
   }
 
   animate(scene: Scene, camera: Camera, clock: Clock): void {
-    (scene.getObjectByName("Suzanne") as Mesh).rotation.y +=
-      clock.getDelta() * 20;
+    (scene.getObjectByName("Suzanne") as Mesh).rotation.y += clock.getDelta() * 20;
   }
 
   getEyeHeight(): number {
@@ -55,7 +55,4 @@ class BasicSceneSupport implements SceneSupport {
   }
 }
 
-export const sceneSupport: SceneSupport = Utils3d.startWithGLTF(
-  "gltf/scene.glb",
-  new BasicSceneSupport()
-);
+export const sceneSupport: SceneSupport = Utils3d.startWithGLTF("gltf/scene.glb", new BasicSceneSupport());
