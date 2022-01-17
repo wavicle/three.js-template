@@ -1,10 +1,4 @@
-import {
-  Material,
-  MeshPhongMaterial,
-  PointLight,
-  Texture,
-  Vector3,
-} from "three";
+import { Material, MeshPhongMaterial, PointLight, Texture, Vector3 } from "three";
 import { GLTFSceneSupport } from "./GLFTSceneSupport";
 import { SceneSupport } from "./SceneSupport";
 
@@ -26,12 +20,8 @@ export const Utils3d = {
     return new MeshPhongMaterial({ map: texture });
   },
 
-  pointLight: function (params: {
-    color: string;
-    intensity: number;
-    position?: Vector3;
-  }) {
-    const light = new PointLight(params.color, params.intensity);
+  pointLight: function (params: { color: string; intensity: number; position?: Vector3 }) {
+    const light = new PointLight(params.color, params.intensity, 50, 1);
     if (params.position) {
       light.position.copy(params.position);
     }

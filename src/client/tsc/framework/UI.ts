@@ -1,5 +1,7 @@
 import { Intersection, Mesh } from "three";
 
+const meshesByName: { [key: string]: Mesh } = {};
+
 export interface UIEvent {
   intersection: Intersection;
 }
@@ -25,6 +27,14 @@ const mouseLeaveHandlers: Map<Mesh, () => void> = new Map();
 const keyPressHandlers: Map<Mesh, (e: KeyPressEvent) => void> = new Map();
 
 export const UI = {
+  addMesh(mesh: Mesh) {
+    meshesByName[mesh.name] = mesh;
+  },
+
+  getMesh(name: string): Mesh | undefined {
+    return meshesByName[name];
+  },
+
   onClick: function (mesh: Mesh, handler: () => void): void {
     clickHandlers.set(mesh, handler);
     intersectables.push(mesh);

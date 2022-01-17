@@ -1,6 +1,7 @@
 import { Camera, Clock, Material, Mesh, Scene } from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { SceneSupport } from "./SceneSupport";
+import { UI } from "./UI";
 
 export class GLTFSceneSupport implements SceneSupport {
   private loader: GLTFLoader = new GLTFLoader();
@@ -27,8 +28,10 @@ export class GLTFSceneSupport implements SceneSupport {
     this.gltf = gltf;
     gltf.scene.traverse(function (node) {
       if (node instanceof Mesh) {
+        UI.addMesh(node);
         node.castShadow = true;
         node.receiveShadow = true;
+        console.log("Loaded: ", node.name);
       }
     });
     scene.add(gltf.scene);

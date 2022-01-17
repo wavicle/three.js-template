@@ -29,7 +29,7 @@ const movements: {
   left: false,
   right: false,
 };
-const speed = 0.15;
+const speed = 0.08;
 
 $(function () {
   window.addEventListener("click", function (event) {
@@ -144,7 +144,7 @@ function animateWithUI() {
 }
 
 function getVisibles(): Object3D[] {
-  return scene.getObjectByName("Visible")?.children || [];
+  return scene.children;
 }
 
 function animateWithKeyboard(target: undefined | Mesh, intersection: undefined | Intersection): void {

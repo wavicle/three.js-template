@@ -1,55 +1,58 @@
-import { Camera, Clock, HemisphereLight, Material, Mesh, Scene, Vector3 } from "three";
+import { Camera, Clock, HemisphereLight, Mesh, Scene, Vector3 } from "three";
 import { SceneSupport } from "../framework/SceneSupport";
 import { Utils3d } from "../framework/Utils3d";
-import { KeyPressEvent, UI } from "../framework/UI";
+import { UI } from "../framework/UI";
 
 class BasicSceneSupport implements SceneSupport {
-  prepare(scene: Scene, camera: Camera): void {
-    camera.position.set(-4, 7, 40);
+  private doorOpen: boolean = false;
 
-    scene.add(new HemisphereLight("#FFFFFF", "#222222", 0.5));
+  prepare(scene: Scene, camera: Camera): void {
+    camera.position.set(0, 6.5, 0);
+
+    scene.add(new HemisphereLight("#FFFFFF", "#222222", 1));
+    /** Main room light */
     scene.add(
       Utils3d.pointLight({
-        color: "#FFFFFF",
+        color: "#BBBBAA",
         intensity: 1,
-        position: new Vector3(0, 40, 0),
+        position: new Vector3(0, 8, 0),
+      })
+    );
+    /** Joe's room light */
+    scene.add(
+      Utils3d.pointLight({
+        color: "#BBBBAA",
+        intensity: 0.5,
+        position: new Vector3(-15, 8, -10),
       })
     );
 
-    const suzanne = scene.getObjectByName("Suzanne") as Mesh;
-    const sphere = scene.getObjectByName("Sphere") as Mesh;
+    const door = UI.getMesh("Yellow_Door") as Mesh;
+    const self = this;
+    function prepareDoorKnob(knob: Mesh) {
+      UI.onMouseEnter(knob, () => {
+        UI.showTooltip("Door<br> <b>[F]</b> " + (self.doorOpen ? "Close door" : "Open door"));
+      });
+      UI.onMouseLeave(knob, () => {
+        UI.hideTooltip();
+      });
+      UI.onKeyPress(knob, (e) => {
+        if (e.keys.includes("KeyF")) {
+          door.rotation.y += self.doorOpen ? -Math.PI / 2 : Math.PI / 2;
+          self.doorOpen = !self.doorOpen;
+        }
+      });
+    }
 
-    UI.onClick(suzanne, () => {
-      suzanne.material = Utils3d.coloredMaterial(Utils3d.getRandomColor());
-    });
-    UI.onMouseEnter(suzanne, () => {
-      UI.showTooltip("Click to change color");
-    });
-    UI.onMouseLeave(suzanne, () => {
-      UI.hideTooltip();
-    });
-
-    UI.onMouseEnter(sphere, () => {
-      UI.showTooltip("Press [F] to change color");
-    });
-    UI.onMouseLeave(sphere, () => {
-      UI.hideTooltip();
-    });
-
-    UI.onKeyPress(sphere, (e: KeyPressEvent) => {
-      if (e.keys[0] == "KeyF") {
-        (e.intersection.object as Mesh).material = Utils3d.coloredMaterial(Utils3d.getRandomColor());
-      }
-    });
+    prepareDoorKnob(UI.getMesh("Yellow_Door_Knob_1") as Mesh);
+    prepareDoorKnob(UI.getMesh("Yellow_Door_Knob_2") as Mesh);
   }
 
-  animate(scene: Scene, camera: Camera, clock: Clock): void {
-    (scene.getObjectByName("Suzanne") as Mesh).rotation.y += clock.getDelta() * 20;
-  }
+  animate(scene: Scene, camera: Camera, clock: Clock): void {}
 
   getEyeHeight(): number {
-    return 6;
+    return 5.5;
   }
 }
 
-export const sceneSupport: SceneSupport = Utils3d.startWithGLTF("gltf/scene.glb", new BasicSceneSupport());
+export const sceneSupport: SceneSupport = Utils3d.startWithGLTF("gltf/rooms.glb", new BasicSceneSupport());
